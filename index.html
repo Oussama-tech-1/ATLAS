@@ -663,8 +663,24 @@
 </head>
 <body>
     <div class="container">
+        <!-- Initial Role Choice -->
+        <div id="role-choice-stage" class="stage active">
+            <div class="login-container">
+                <div class="login-logo">🔐</div>
+                <h1 class="login-title">ATLAS</h1>
+                <p class="login-subtitle">Choose Your Role</p>
+
+                <button class="btn btn-primary" onclick="startAdminLogin()" style="width: 100%; margin-bottom: 15px; padding: 20px;">
+                    🔐 Project Admin<br><small style="opacity: 0.8;">Global system owner</small>
+                </button>
+                <button class="btn btn-secondary" onclick="startCafeLogin()" style="width: 100%; padding: 20px;">
+                    ☕ Café Staff<br><small style="opacity: 0.8;">Select your café</small>
+                </button>
+            </div>
+        </div>
+
         <!-- Café Selection -->
-        <div id="cafe-select-stage" class="stage active">
+        <div id="cafe-select-stage" class="stage">
             <div class="login-container">
                 <div class="login-logo">🏢</div>
                 <h1 class="login-title">ATLAS</h1>
@@ -681,6 +697,7 @@
                     <button class="btn btn-primary" onclick="proceedToLogin()" style="flex: 1;">Next</button>
                     <button class="btn btn-secondary" onclick="showNewCafeForm()" style="flex: 1;">+ New Café</button>
                 </div>
+                <button class="btn btn-secondary" onclick="backToRoleChoice()" style="width: 100%; margin-top: 15px;">Back to Role Selection</button>
 
                 <!-- New Café Form -->
                 <div id="new-cafe-form" style="display: none; margin-top: 30px; padding-top: 30px; border-top: 2px solid var(--border);">
@@ -723,7 +740,7 @@
                 <button class="btn btn-primary" onclick="loginProjectAdmin()" style="width: 100%; margin-bottom: 10px;">Login as Project Admin</button>
                 <button class="btn btn-secondary" onclick="showProjectAdminReset()" style="width: 100%; margin-bottom: 20px;">Forgot Password?</button>
 
-                <button class="btn btn-secondary" onclick="backToRoleSelection()" style="width: 100%;">Back</button>
+                <button class="btn btn-secondary" onclick="backToRoleChoice()" style="width: 100%;">Back</button>
             </div>
         </div>
 
@@ -758,22 +775,6 @@
                 </div>
 
                 <button class="btn btn-secondary" onclick="backToCafeSelection()" style="width: 100%; margin-top: 20px;">Back to Café Selection</button>
-            </div>
-        </div>
-
-        <!-- Role Selection Stage (for café login) -->
-        <div id="role-select-stage" class="stage">
-            <div class="login-container">
-                <div class="login-logo">🔑</div>
-                <h1 class="login-title">Select Your Role</h1>
-                <p class="login-subtitle" id="role-cafe-name">Café Name</p>
-
-                <button class="btn btn-primary" onclick="proceedToProjectAdminLogin()" style="width: 100%; margin-bottom: 15px; padding: 20px;">
-                    🔐 Project Admin<br><small style="opacity: 0.8;">Global system owner</small>
-                </button>
-                <button class="btn btn-secondary" onclick="proceedToCafeLogin()" style="width: 100%; padding: 20px;">
-                    ☕ Staff / Audit<br><small style="opacity: 0.8;">Café staff or audit manager</small>
-                </button>
             </div>
         </div>
 
@@ -963,14 +964,25 @@ function selectCafe() {
     currentCafe = document.getElementById('cafe-selector').value;
 }
 
+function startAdminLogin() {
+    document.getElementById('role-choice-stage').classList.remove('active');
+    document.getElementById('project-admin-login-stage').classList.add('active');
+}
+
+function startCafeLogin() {
+    document.getElementById('role-choice-stage').classList.remove('active');
+    document.getElementById('cafe-select-stage').classList.add('active');
+}
+
 function proceedToLogin() {
     if (!currentCafe) {
         alert('Please select a café');
         return;
     }
     document.getElementById('cafe-select-stage').classList.remove('active');
-    document.getElementById('role-select-stage').classList.add('active');
-    document.getElementById('role-cafe-name').textContent = currentCafe;
+    document.getElementById('login-stage').classList.add('active');
+    document.getElementById('login-cafe-name').textContent = currentCafe;
+    applyTheme(currentCafe);
 }
 
 function showNewCafeForm() {
@@ -1020,7 +1032,6 @@ function createNewCafe() {
 
 function backToCafeSelection() {
     document.getElementById('login-stage').classList.remove('active');
-    document.getElementById('role-select-stage').classList.remove('active');
     document.getElementById('cafe-select-stage').classList.add('active');
     document.getElementById('cafe-selector').value = '';
     currentCafe = null;
@@ -1049,21 +1060,12 @@ function logTransaction(cafeName, action, details, role) {
 }
 
 // ============ AUTHENTICATION ============
-function proceedToProjectAdminLogin() {
-    document.getElementById('role-select-stage').classList.remove('active');
-    document.getElementById('project-admin-login-stage').classList.add('active');
-}
-
-function proceedToCafeLogin() {
-    document.getElementById('role-select-stage').classList.remove('active');
-    document.getElementById('login-stage').classList.add('active');
-    document.getElementById('login-cafe-name').textContent = currentCafe;
-    applyTheme(currentCafe);
-}
-
-function backToRoleSelection() {
+function backToRoleChoice() {
     document.getElementById('project-admin-login-stage').classList.remove('active');
-    document.getElementById('role-select-stage').classList.add('active');
+    document.getElementById('login-stage').classList.remove('active');
+    document.getElementById('role-choice-stage').classList.add('active');
+    currentCafe = null;
+    currentUser = null;
 }
 
 function switchLoginTab(tab) {
